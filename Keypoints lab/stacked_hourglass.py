@@ -49,8 +49,9 @@ def create_stacked_hourglass_model(img_input, n_keypoints, n_hourglasses, start_
     a basic Conv2D
     :return: a tensorflow model
     """
+    x = tf_layers.Rescaling(1. / 255.)(x),
     x = tf_layers.Conv2D(start_filters, (3, 3), padding='same', activation='relu')(
-        img_input)  # transform to the hourglass base size
+        x)  # transform to the hourglass base size
 
     skip = x
     output_list = []
