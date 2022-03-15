@@ -5,15 +5,29 @@ from tensorflow.keras import layers as tf_layers
 
 def residual_block(x, n_filters, mode='residual'):
     if mode == 'residual':
-        skip = tf_layers.Conv2D(n_filters, (1, 1), activation='relu')(x)
+        skip = tf_layers.Conv2D(n_filters, (1, 1))(x)
+        skip = tf_layers.BatchNormalization()(skip)
+        skip = tf_layers.LeakyReLU(alpha=0.1)(skip)
 
-        x = tf_layers.Conv2D(n_filters // 2, (1, 1), activation='relu')(x)
-        x = tf_layers.Conv2D(n_filters // 2, (3, 3), padding='same', activation='relu')(x)
-        x = tf_layers.Conv2D(n_filters, (1, 1), activation='relu')(x)
+        x = tf_layers.Conv2D(n_filters // 2, (1, 1))(x)
+        x = tf_layers.BatchNormalization()(x)
+        x = tf_layers.LeakyReLU(alpha=0.1)(x)
+        
+        x = tf_layers.Conv2D(n_filters // 2, (3, 3), padding='same')(x)
+        x = tf_layers.BatchNormalization()(x)
+        x = tf_layers.LeakyReLU(alpha=0.1)(x)
+        
+        x = tf_layers.Conv2D(n_filters, (1, 1))(x)
+        x = tf_layers.BatchNormalization()(x)
+        x = tf_layers.LeakyReLU(alpha=0.1)(x)
+        
         x = tf_layers.Add()([skip, x])
+        x = tf_layers.Dropout(0.2)(x)
 
     elif mode == 'simple':
-        x = tf_layers.Conv2D(n_filters, (3, 3), padding='same', activation='relu')(x)
+        x = tf_layers.Conv2D(n_filters, (3, 3), padding='same')(x)
+        x = tf_layers.BatchNormalization()(x)
+        x = tf_layers.LeakyReLU(alpha=0.1)(x)
 
     return x
 
@@ -57,7 +71,7 @@ def create_stacked_hourglass_model(img_input, n_keypoints, n_hourglasses, start_
     for i in range(n_hourglasses):
         x = hourglass_block(x, start_filters * 2, max_filters, mode)
 
-        output = tf_layers.Conv2D(n_keypoints, (1, 1), activation='linear', name=f'output_{i}')(x)  # produce heatmaps
+        output = tf_layers.Conv2D(n_keypoints, (1, 1), activation='sigmoid', name=f'output_{i}')(x)  # produce heatmaps
         output_list.append(output)
         mapped_output = tf_layers.Conv2D(start_filters, (1, 1), activation='relu')(
             output)  # map back to the base size
