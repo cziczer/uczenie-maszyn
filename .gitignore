@@ -2,6 +2,6 @@
 *.ipynb_checkpoints
 *__pycache__
 
-Keypoints lab/images/
-Keypoints lab/results.npy
-Keypoints lab/model_checkpoints/simple
+lab1/data
+lab2/images/
+lab2/model_checkpoints/simple
