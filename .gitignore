@@ -3,5 +3,6 @@
 *__pycache__
 
 lab1/data
+lab1/model_checkpoints
+
 lab2/images/
-lab2/model_checkpoints/simple
